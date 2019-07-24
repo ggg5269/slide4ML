@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Neural Network</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="陳懷安" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="animate.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+class: title-slide, left, bottom, inverse
+background-image: linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.4) 100%), url("https://miro.medium.com/max/3000/1*m2gDBT_nc-iE7R4AM3sHBQ.jpeg")
+.bg-text[
+# &lt;big&gt;&lt;font color = "white"&gt;NEURAL NETWORK&lt;/font&gt;&lt;/big&gt;
+## &lt;big&gt;&lt;font color = "white"&gt;ESL&lt;/font&gt;&lt;/big&gt;
+&lt;hr /&gt;
+七月 24 2019 &lt;br/&gt;
+陳懷安
+]
+---
+
+
+# Intro.  
+
+- 將解釋變數的線性組合作為*derived features*  
+
+- 接著透過這些&lt;mark&gt;特徵&lt;/mark&gt;(*features*)的非線性函數建模  
+
+
+---
+class: center, middle
+background-image: url("https://thumbs.gfycat.com/HealthyPerfectHaddock-small.gif")
+background-size: cover
+
+# &lt;font color = "white"&gt;Projection Pursuit Regression&lt;/font&gt;  
+## &lt;font color = "white"&gt;投影追蹤迴歸&lt;/font&gt;  
+
+---
+# Projection Pursuit Regression&lt;sup&gt;1&lt;/sup&gt;
+
+.left-column[
+## Model  
+]
+
+.right-column[.small[
+`$$\large{f(X)=\sum_{m=1}^M \color{blue}{g_m(w_m^TX)} \tag{1.1}}$$`   `$$where \ g:\mathbb{R} \rightarrow\mathbb{R}, and \  w\in\mathbb{R}^p \backslash \lbrace0\rbrace$$`]  
+--
+其中 `\(\color{blue}{g_m(w_m^TX)}\)`為嶺函數(*ridge function*&lt;sup&gt;2&lt;/sup&gt;)，目的是將 `\(X\)`投影在 `\(w\)`方向向量上，透過 `\(g\)`作用後的加總來逼近迴歸函數。  
+
+]
+
+.small[.footnote[
+&lt;font size="2"&gt;
+[1] Friedman, J.H. and Stuetzle, W. (1981) Projection Pursuit Regression. Journal of the American Statistical Association.&lt;br/&gt;
+[2] B. F. Logan and L. A. Shepp (1975). Optimal Reconstruction of a Function From Its Projections. Duke Mathematical Journal.  
+&lt;/font&gt;
+]]
+---
+
+# Projection Pursuit Regression
+.left-column[
+## Model
+## Example 
+]
+  
+.right-column[
+課本範例：  
+.center[
+&lt;img src="fig1.jpg" style="width: 45%" /&gt;&lt;br/&gt;
+.center[fig. 1 ridge functiom]
+`$$w^T = \frac{1}{\sqrt2}\left[\matrix{1 \\ 1}\right], \ V=w^TX, \ V=\frac{X_1+X_2}{\sqrt{2}} \\ g(V)=1/(1+\exp(-5(V-0.5))$$`]]
+
+
+---
+# Projection Pursuit Regression
+.left-column[
+## Model  
+## Example 
+## Estimation
+]
+
+.right-column[
+`$$min\ \sum_{i=1}^N \left[y_i-\sum_{m=1}^M g_m(w_m^TX)\right]\tag{1.2}$$`  
+- `\(\color{blue}{估計\ g}\)`  
+給定 `\(w\)`，透過平滑算法，如:*smoothing spline*，得到 `\(\hat{g}\)`。
+- `\(\color{blue}{估計\ w}\)`  
+利用Gauss-Newton法，我們有
+`$$g(w_m^Tx_i)\approx g(w_{old}^Tx_i)+g'(w_{old}^Tx_i)(w-w_{old})^Tx_i$$`  
+代回 `\((1.2)\)`，解極小化問題得 `\(w_{new}\)`。  
+
+- `\(\color{blue}{反覆迭代}\)`上兩個步驟直到結果收斂。
+]
+
+
+.footnote[
+&lt;font size="2"&gt;&lt;a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.228.6416&amp;rep=rep1&amp;type=pdf"&gt;Allan Pinkus. Approximating By Ridge Functions.&lt;/a&gt;&lt;/font&gt;
+]
+???
+高斯牛頓法捨棄H的二階偏導數，處理當該項計算困難時的狀況。利用一階導數資訊去逼近。 前提是殘差需接近線性函數或是0，否則不會收斂。  
+- 基本上，任意平滑篹法都可以適用。  
+- 對於 `\(M\)`，可以透過交叉驗證(CV)來決定。  
+- 之所以沒被廣泛使用，提出當時(1981)，計算機的計算能力還不夠強。
+---
+class: middle, center  
+background-image: linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.4) 100%), url("https://ak5.picdn.net/shutterstock/videos/9053965/thumb/1.jpg")  
+background-size: cover
+# &lt;font style="background: rgba(100%,100%,100%,0.6)"&gt;Neural Network&lt;/font&gt; 
+## 類神經網路  
+---
+# Neural Network  
+.pull-left[
+- 基本型態(*vanilla*)的類神經網路  
+  - single hidden layer back-propogation network  
+    
+  - single layer perceptron  
+- non-linear statistical model  
+&lt;br/&gt;&lt;br/&gt;
+右圖為一個單隱藏層K類的分類模型。
+]  
+
+.pull-right[
+&lt;img src="fig2.jpg" style="width: 100%" /&gt;&lt;br/&gt;
+.center[fig. 2 network diagram]
+]  
+
+---
+## NN Model  
+模型如下：  
+&lt;br/&gt;
+
+`$$\large{\large{\begin{align}Z_m&amp;=\color{blue}{\sigma}(\alpha_{0m}+\alpha_m^TX),\ m=1,...,M \\ T_k&amp;=\beta_{0k}+\beta_k^TZ,\ k=1,...,K\\ f_k(X)&amp;=g_k(T),\ k=1,...,K\tag{2.1}\end{align}}}$$`
+  
+  
+   
+--
+
+
+- 激勵函數(*activation funtion*&lt;sup&gt;4&lt;/sup&gt;) `\(\color{blue}{\sigma(v)}\)`，如： `\(\sigma(v)=1/(1+e^{-v})\)`。  
+- `\(g_k(X)\)`作為最後的轉換函數。  
+  - 在迴歸中，一般就採用 `\(g_k(T) = T\)`  
+  
+  - 分類模型，使用*softmax function*&lt;sup&gt;3&lt;/sup&gt;會比較好  
+
+.footnote[
+&lt;font size="2"&gt;[3] `\(g_k(T)=e^{Tk}/\sum^K_{l=1}e^Tk\)`&lt;/font&gt;&lt;br/&gt;
+&lt;font size="2"&gt;[4] 較早期的模型在 `\(\sigma(Z),\ g_m(T)\)`多採用階梯函數(&lt;i&gt;step function&lt;/i&gt;)。之後類神經網路用來做非線性統計建模時，階梯函數在優化上就不如一些閾值較平滑的函數。&lt;/font&gt;
+]
+
+???
+
+
+ReLU可以克服sigmoid, tanh的梯度消失問題  
+也可以讓網路變得稀疏，避免過度配適  
+節省計算量  
+但會有dead ReLU problem產生 &gt;&gt; Leaky ReLU, rand. ReLU, Maxout...  
+
+---
+## Activation Function  
+.pull-left[
+```YAML
+library(ggplot2)
+sigmoid &lt;- function(x) {
+  return(1 / (1 + exp(-x)))}
+ReLU &lt;- function(x) {
+  ifelse(x &lt; 0, 0, x)}
+LReLU &lt;- function(x) {
+  ifelse(x &lt; 0, 0.1 * x, x)}
+tanh &lt;- function(x) {
+  return(2 / (1 + exp(-2 * x)) - 1)}
+
+ggplot() +
+  stat_function(aes(x = -2:2, colour = "sigmoid"), fun = sigmoid) +
+  stat_function(aes(x = -2:2, colour = "ReLU"), fun = ReLU) +
+  stat_function(aes(x = -2:2, colour = "LReLU"), fun = LReLU) +
+  stat_function(aes(x = -2:2, colour = "tanh"), fun = tanh) +
+  scale_colour_manual("Activation Func.",
+    values = c("sigmoid" = "red", "ReLU" = "blue", "LReLU" = "green", "tanh" = "brown"))
+```
+]
+.pull-right[
+![](main_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+]  
+
+  
+???
+Leaky ReLU 避免dead ReLU problem  
+---
+## Equivalent To PPR  
+For single-layer network, say `\(g_k(T) = T_k\)`is identity function.  
+
+`$$\large{\begin{align*}f_k(X)=g_k(T)=T_k&amp;=\beta_{0k}+\sum_{m=1}^M\beta_{km}^TZ_m\\ &amp;=\beta_{0k}+\sum_{m=1}^M\beta_{km}^T\sigma(\alpha_{0m}+\alpha_m^TX)\\ &amp;=\sum_{m=0}^M\beta_{km}^T\sigma(\alpha_{0m}+||\alpha_{0m}||(w_m^TX))\tag{2.2}\end{align*}}$$`  
+--
+So it is equivalent to PPR with `\(\color{blue}{g_m(w_m^TX)=\beta_{km}^T\sigma(\alpha_{0m}+||\alpha_{0m}||(w_m^TX))}\)` for the `\(\color{blue}{m_{th}}\)`output.  
+&lt;br/&gt;
+我們可以將其看做一個三個參數的模型 `\(\sigma_{\color{blue}{\beta,\alpha_0,s}}(v)=\beta\sigma(\alpha_0+sv)\)`，比起PPR的 `\(g(v)\)`單純很多。  
+
+???
+因此不難想像為何NN動輒幾十層。  
+
+---
+# Fitting Neural Network  
+.left-column[
+## Loss Function
+]
+
+
+.right-column[
+- 損失(*Loss*) = 殘差  
+
+.pull-left[
+
+&lt;h3&gt;Regression&lt;/h3&gt;  
+- MSE  
+  - `\(\large{R(\theta)=\frac{\sum(y_i-\hat{y_i})^2}{n}}\)`
+- MAE  
+  - `\(\large{R(\theta)=\frac{\sum|y_i-\hat{y_i}|}{n}}\)`  
+  
+- Huber Loss ...  
+
+]
+
+.pull-right[
+&lt;h3&gt;Classification&lt;/h3&gt;  
+- Cross Entropy  
+  - `\(R(\theta)=\sum\sum -y_{c,i}\log(p_{c,i})\)`  
+  
+- Focal Loss&lt;sup&gt;5&lt;/sup&gt; ...  
+
+]
+]
+  
+
+.footnote[
+&lt;font size="2"&gt;[5] Tsung-Yi Lin, Priya Goyal, Ross Girshick, Kaiming He, Piotr Dollar. (2017). Focal Loss for Dense Object Detection. Facebook AI Research.&lt;/font&gt;
+]
+???
+Huber  
+調和MSE、MAE  
+`$$Loss(y,\hat{y}) = \begin{equation} \left\{ \begin{array}{**lr**} \dfrac{1}{2}(y-\hat{y})^2,&amp;  |y-\hat{y}|\leq\delta \\ \delta(|y-\hat{y}|-\dfrac{1}{2}}\delta),&amp; O.W. \end{array} \right. \end{equation}$$`  
+
+`\(\alpha\)`-balance Focal Loss  
+給CE加上權重  
+`$$FL (p_t)= -\alpha(1-p_t)^\gamma \log(p_t)$$`  
+where `\(\gamma\)` is focusing parameter.  
+---
+# Fitting Neural Network  
+.left-column[
+## Loss Function  
+## Back Propagation  
+]  
+
+.right-column[
+&gt; 與一般模型一樣，我們需要極小化損失函數來提升模型的準確率。但模型不像傳統迴歸問題那樣，而是可能包含許多隱藏層，因此需要逐層調整。剛好，透過大家都會的連鎖率(*chain rule*)可以輕鬆做到。  
+
+]
+---
+# Fitting Neural Network  
+.left-column[
+## Loss Function  
+## Back Propagation  
+]  
+.right-column[
+`$$\small{R(\theta)=\sum_{i=1}^N \sum_{k=1}^K(y_{ik}-g_k(\beta_0+\beta_k^T(\sigma(\alpha_{0m}+\alpha_m^Tx_i))))\tag{2.3}}$$`
+分別對 `\(\alpha,\ \beta\)`微分，  
+`$$\small{\begin{align*} \dfrac{\partial R_i}{\partial \beta_{km}} = -2&amp;\color{blue}{(y_{ik}-f_k(x_i))g_k'(\beta_k^Tz_i)}z_{mi} \\ \dfrac{\partial R_i}{\partial \alpha_{ml}} =-2\sum_{k=1}^K&amp;\color{blue}{(y_{ik}-f_k(x_i))g_k'(\beta_k^Tz_i)}\beta_{km}\sigma'(\alpha_m^Tx_i)x_{il}\end{align*}\tag{2.4}}$$`  
+因此在第( `\(r+1\)`)步時，迭代更新為  
+
+`$$\small{\begin{align*}\beta_{km}^{(r+1)}&amp;=\beta_{km}^{(r)}-\gamma_r\sum_{i=1}^N \dfrac{\partial R_i}{\partial \beta_{km}^{(r)}} \\ \alpha_{ml}^{(r+1)}&amp;=\alpha_{ml}^{(r)}-\gamma_r\sum_{i=1}^N \dfrac{\partial R_i}{\partial \alpha_{ml}^{(r)}}\end{align*} \tag{2.5}}$$`
+]
+---
+# Fitting Neural Network  
+.left-column[
+## Loss Function  
+## Back Propagation  
+]  
+
+.right-column[
+改寫 (2.4)，  
+`$$\begin{align*} \dfrac{\partial R_i}{\partial \beta_{km}} = \delta_{ki}z_{mi} \\ \dfrac{\partial R_i}{\partial \alpha_{ml}} =s_{mi}x_{il}\end{align*}\tag{2.6}$$`
+由 (2.4)，我們可以得到  
+`$$\small{s_{mi}=\sigma'(\alpha^T_mx_i)\sum_{k=1}^K\beta_{km}\delta_{ki}\tag{2.7}}$$`  
+&gt; 通過上式，我們能完成一套 *two-pass*過程。首先 *forward pass*的部分，給定權重計算出 `\(\hat{f_k}(x_i)\)`； *backward pass*則是透過(2.4)、(2.5)去進行權重的更新，這套流程也就是&lt;font color = "blue"&gt;&lt;b&gt;向後傳播&lt;/b&gt;&lt;/font&gt;。
+
+]
+---
+# Fitting Neural Network  
+.left-column[
+## Loss Function  
+## Back Propagation  
+## Example
+]  
+
+.right-column[
+.center[
+[&lt;img src="NN_playground.jpg" style="width: 100%" /&gt;](https://playground.tensorflow.org/)  
+fig 3. Neural Network Model
+]
+]
+---
+# Fitting Neural Network  
+.left-column[
+## Loss Function  
+## Back Propagation  
+## Example
+]  
+
+
+.right-column[
+&gt; 1 hidden layer with 8 neurons  
+
+.pull-left[
+.center[
+&lt;img src="relu_0.03_online_1_8.gif" style="width: 90%" /&gt;  
+fig 4. online learning
+]  
+]
+
+.pull-right[
+.center[
+&lt;img src="relu_0.03_batch19_1_8.gif" style="width: 90%" /&gt;  
+fig 5. batch size 19
+]
+]
+
+
+]
+---
+# Fitting Neural Network  
+.left-column[
+## Loss Function  
+## Back Propagation  
+## Example
+]  
+
+
+.right-column[
+&gt; 4 hidden layers, each with 5 neurons  
+
+.pull-left[
+.center[
+&lt;img src="relu_0.03_online_4_5.gif" style="width: 90%" /&gt;  
+fig 6. online learning
+]  
+]
+
+.pull-right[
+.center[
+&lt;img src="relu_0.03_batch10_4_5.gif" style="width: 90%" /&gt;  
+fig 7. batch size 10
+]
+]
+
+
+]
+---
+# Issues  
+.left-column[
+## Starting Values
+]
+
+.right-column[
+.center[
+![](main_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+  
+fig 8. sigmoid function
+]
+&gt; 上圖為 `\(\sigma(sx)=1/(1+\exp(-sx))\)`, `\(s\)` 分別為 `\(1, 0.3, 10\)`。  
+一般都會以一個接近零的數字開始，讓模型逐步從近似線性到非線性。  
+
+]
+
+???
+playground NN +-0.5
+---
+# Issues  
+.left-column[
+## Starting Values  
+## Overfitting
+]
+
+.right-column[
+為避免模型過度配適，通常會採用以下方法
+- &lt;font color = "blue"&gt;提前結束訓練&lt;/font&gt; 觀察驗證資料集，當error開始上升的時候就可以停止訓練了。  
+- &lt;font color = "blue"&gt;正規化(&lt;i&gt;Regularization&lt;/i&gt;)&lt;/font&gt; ，將懲罰項(*Penalty*)加入*loss function*  
+`$$\large{Loss Function = R(\theta)+\lambda\color{blue}{J(\theta)}} \\ \small{\lambda 在這裡為一個調整參數，值越大，權重縮減幅度越大。}$$`  
+  - &lt;font color = "blue"&gt;*weight decay*&lt;/font&gt;: `\(J(\theta)=\sum {w_i}^2\)`  
+  
+  - &lt;font color = "blue"&gt;*weight elimination*&lt;/font&gt;&lt;sup&gt;6&lt;/sup&gt;: `\(J(\theta)=\sum w_i^2/(1+w_i^2)\)`  
+- &lt;font color = "blue"&gt;&lt;b&gt;&lt;i&gt;Drop-out&lt;/i&gt;&lt;/b&gt;&lt;/font&gt; ...
+]
+
+.footnote[
+&lt;font size="2"&gt;[6] 為了解決&lt;i&gt;weight decay&lt;/i&gt;遺留下來很多數字小但非0的權重，又要兼具L2容易微分的優點。&lt;/font&gt;
+]
+---
+# Issues  
+.left-column[
+## Starting Values  
+## Overfitting  
+## Scaling
+]
+
+.right-column[
+- 在自變數的處理上可以先標準化，避免在正規化的過程，受到數值規模不同的干擾。  
+
+- 接著，一般起始的權重，會設定  
+`$$\large{w_i \sim \rm{U(-0.7, 0.7)}}$$`
+]
+---
+# Issues  
+.left-column[
+## Starting Values  
+## Overfitting
+## Scaling  
+## The Hiddens  
+]
+
+.right-column[
+- 一般來說，隱藏單元(*hidden units*)是&lt;font color = "blue"&gt;多多益善&lt;/font&gt;，只要能搭配合適的正規化操作。  
+  
+- 依靠背景知識、過往經驗等等來決定要設定幾層隱藏層。  
+
+- 增加神經元(*neuron*)可以提升模型的解釋能力及複雜度&lt;sup&gt;7&lt;/sup&gt;。  
+
+- 增加隱藏層可能可以提升模型準確率(*accuracy*)，但過多可能會造成預測力下降。  
+]  
+
+.footnote[
+&lt;font size="2"&gt;[7] Ian Goodfellow, Yoshua Bengio and Aaron Courville. (2016). Deep Learning. MIT Press.&lt;/font&gt;
+]
+
+???
+
+有人可能會說用CV來估計需要多少隱藏層、單元，但作者認為沒有必要。  
+---
+# Issues  
+.left-column[
+## Overfitting
+## Scaling  
+## The Hiddens  
+## Multiple Minima  
+]
+
+.right-column[
+&gt; 基於 `\(R(\theta)\)`為非凸函數，會存在許多局部極小值(*local minimum*)，要找到真正的極小值是困難的。  
+
+解決這個問題：  
+- bagging  
+- 提升學習率(*learning rate*)  
+  
+- 嘗試其他[演算法](http://ruder.io/optimizing-gradient-descent/)  
+- 不管他&lt;sup&gt;8&lt;/sup&gt;。當模型漸趨複雜，過於追求&lt;font color = "blue"&gt;真正的&lt;/font&gt;最小值(*global minimun*)，往往會造成過度配適的問題發生。
+]
+
+.footnote[
+&lt;font size="2"&gt;[8] Anna Choromanska, Mikael Henaff, Michael Mathieu, G´erard Ben Arous and Yann LeCun. (2015). The Loss Surfaces of Multilayer Networks. Journal of Machine Learning Research.&lt;/font&gt;
+]
+---
+# Example  
+
+---
+# Discussion  
+
+---
+
+
+???
+
+記得補tag
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "14:9",
+"click": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

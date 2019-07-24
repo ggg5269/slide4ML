@@ -1,0 +1,13 @@
+if (!requireNamespace("xaringan"))
+devtools::install_github("yihui/xaringan")
+if (!requireNamespace("xaringan"))
+devtools::install_github("yihui/xaringan")
+library(digest)
+if (!requireNamespace("xaringan"))
+devtools::install_github("yihui/xaringan")
+pkginstall
+library(pkg)
+install.packages("pkg")
+install.packages("pkg")
+install.packages(""digest)
+install.packages("digest")

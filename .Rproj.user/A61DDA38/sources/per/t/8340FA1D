@@ -1,0 +1,27 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1563687022228.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4003215521",
+    "id" : "8340FA1D",
+    "lastKnownWriteTime" : 1563908787,
+    "last_content_update" : 1563908787607,
+    "path" : "~/R/slides4ML/main.Rmd",
+    "project_path" : "main.Rmd",
+    "properties" : {
+        "cursorPosition" : "505,0",
+        "last_setup_crc32" : "",
+        "scrollLine" : "475",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
