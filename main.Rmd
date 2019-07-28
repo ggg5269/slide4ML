@@ -507,6 +507,7 @@ $$\large{w_i \sim \rm{U(-0.7, 0.7)}}$$
 ---
 # Example  
 
+[Here's the example](https://ggg5269.github.io/slide4ML/ex11_6.html)
 ---
 # Discussion  
 
