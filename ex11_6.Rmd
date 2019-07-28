@@ -8,7 +8,7 @@ output:
     highlight: github
 ---
 
-```{r}
+```{r include=FALSE}
 library(hash)
 ```
 
@@ -125,7 +125,7 @@ test <- function(model) {
 ```
 
 ```{r}
-test(train(5, 50000))
+test(train(2, 50000))
 ```
 
 
