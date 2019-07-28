@@ -1,0 +1,145 @@
+---
+title: "Example 11.6 DEMO"
+author: "陳懷安"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: leonids
+    highlight: github
+---
+
+```{r}
+library(hash)
+```
+
+## DATA GEN.  
+In the first model, we have  
+
+$$\rm{by}\ Y=\sigma(a_1^TX)+\sigma(a_2^TX)+\epsilon \\ \rm{where}\ X^T=(X_1,\ X_2),\ \ X_j \sim N(0,\ 1),\ a_1=(3,\ 3)\ \rm{and} \ a_2=(3,\ -3). \\ \epsilon\ s.t. \frac{Var(f(x))}{Var(\epsilon)}=4.$$  
+  
+Here, we define our activation function.   
+```{r}
+sigmoid <- function(x) {
+  return(1 / (1 + exp(-x)))
+}
+```
+
+```{r}
+X_train <-
+  matrix(c(rnorm(100, 0, 1), rnorm(100, 0, 1)), 100, 2, TRUE)
+X_test <-
+  matrix(c(rnorm(10000, 0, 1), rnorm(10000, 0, 1)), 10000, 2, TRUE)
+
+a1 <- matrix(c(3, 3), 1, 2, TRUE)
+a2 <- matrix(c(3,-3), 1, 2, TRUE)
+
+e_var <- var(X_train)[1, 1] / 4
+e_train <- matrix(rnorm(100, 0, e_var), 100, 1, TRUE)
+e_test <- matrix(rnorm(10000, 0, e_var), 10000, 1, TRUE)
+
+Y_train <-
+  sigmoid(X_train %*% t(a1)) + sigmoid(X_train %*% t(a2)) + e_train
+Y_test <-
+  sigmoid(X_test %*% t(a1)) + sigmoid(X_test %*% t(a2)) + e_test
+```
+
+## MODEL  
+
+We set the model like this.   
+
+$$\begin{align} Z_m &=\sigma(\alpha_{0m}+\alpha_m^TX)\qquad m=1,\ldots, M\\ T_k &= \beta_{0k}+\beta_k^TZ\qquad k=1,\ldots,K\\ f_k(X) &= g_k(T) = T\end{align}$$  
+
+And the loss function with wieght decay is  
+
+$$R(\theta) = \sum\limits_{i=1}^N\sum\limits_{k=1}^K(y_{ik}-f_k(x_i))^2$$  
+
+## BACK PROPAGATION  
+
+$$\frac{\partial R_i}{\partial \beta_{km}}=\delta_{ki}z_{mi}$$
+$$\frac{\partial R_i}{\partial \alpha_{m\ell}}=s_{mi}x_{i\ell}$$
+$$\frac{\partial R_i}{\partial \beta_{0k}}=\delta_{ki}$$
+$$\frac{\partial R_i}{\partial \alpha_{0m}}=s_{mi}$$
+$$\sigma'(v)=\sigma(v)(1-\sigma(v))$$
+$$g_k'(T)=1$$
+
+## TRAINING MODEL  
+
+```{r}
+train <-
+  function(nneuron = 2,
+           epoch = 500,
+           learning_rate = 0.0001,
+           lambda = 0.01) {
+    
+    # weights and biases
+    alpha <-
+      matrix(c(runif(nneuron,-0.7, 0.7), runif(nneuron,-0.7, 0.7)), 2, nneuron, TRUE)
+    beta <- matrix(c(runif(nneuron,-0.7, 0.7)), nneuron, 1, TRUE)
+    a <- matrix(0, 1, nneuron)
+    b <- matrix(0, 1, 1)
+    
+    nnmodel = hash()
+    
+    #training
+    for (i in epoch) {
+      z <- sigmoid(sweep(X_train %*% alpha, 2, a, "+"))
+      t <- sweep(z %*% beta, 2, b, "+")
+      pred <- t
+      
+      delta <- -2 * (Y_train - pred)
+      d_beta <- t(z) %*% delta
+      d_b <- matrix(apply(delta, 2, sum), 1, 1, T)
+      
+      s <- delta %*% t(beta) * (z * (1 - z))
+      d_alpha <- t(X_train) %*% s
+      d_a <- matrix(apply(s, 2, sum), 1, nneuron, T)
+      
+      d_beta <- d_beta + 2 * lambda * beta
+      d_alpha <- d_alpha + 2 * lambda * alpha
+      
+      alpha <-  alpha - learning_rate * d_alpha
+      a <- a - learning_rate * d_a
+      beta <- beta - learning_rate * d_beta
+      b <- b - learning_rate * d_b
+      
+      .set(
+        nnmodel,
+        alpha = alpha,
+        beta = beta,
+        a = a,
+        b = b
+      )
+    }
+    return(nnmodel)
+  }
+```
+
+```{r}
+test <- function(model) {
+  z <- sigmoid(sweep(X_test %*% model$alpha, 2, model$a, "+"))
+  t <- sweep(z %*% model$beta, 2, model$b, "+")
+  pred <- t
+  pred.loss <- 1 / 10000 * sum((pred - Y_test) ^ 2)
+  return(pred.loss)
+}
+```
+
+```{r}
+test(train(5, 50000))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

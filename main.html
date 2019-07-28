@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
   <head>
-    <title>Neural Network</title>
+    <title>CH11 Neural Network</title>
     <meta charset="utf-8" />
     <meta name="author" content="陳懷安" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
@@ -17,7 +17,7 @@ background-image: linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, rgba(255,
 # &lt;big&gt;&lt;font color = "white"&gt;NEURAL NETWORK&lt;/font&gt;&lt;/big&gt;
 ## &lt;big&gt;&lt;font color = "white"&gt;ESL&lt;/font&gt;&lt;/big&gt;
 &lt;hr /&gt;
-七月 24 2019 &lt;br/&gt;
+七月 28 2019 &lt;br/&gt;
 陳懷安
 ]
 ---
@@ -163,13 +163,17 @@ ReLU可以克服sigmoid, tanh的梯度消失問題
 ```YAML
 library(ggplot2)
 sigmoid &lt;- function(x) {
-  return(1 / (1 + exp(-x)))}
+  return(1 / (1 + exp(-x)))
+  }
 ReLU &lt;- function(x) {
-  ifelse(x &lt; 0, 0, x)}
+  ifelse(x &lt; 0, 0, x)
+  }
 LReLU &lt;- function(x) {
-  ifelse(x &lt; 0, 0.1 * x, x)}
+  ifelse(x &lt; 0, 0.1 * x, x)
+  }
 tanh &lt;- function(x) {
-  return(2 / (1 + exp(-2 * x)) - 1)}
+  return(2 / (1 + exp(-2 * x)) - 1)
+  }
 
 ggplot() +
   stat_function(aes(x = -2:2, colour = "sigmoid"), fun = sigmoid) +
@@ -239,22 +243,27 @@ So it is equivalent to PPR with `\(\color{blue}{g_m(w_m^TX)=\beta_{km}^T\sigma(\
 ???
 Huber  
 調和MSE、MAE  
-`$$Loss(y,\hat{y}) = \begin{equation} \left\{ \begin{array}{**lr**} \dfrac{1}{2}(y-\hat{y})^2,&amp;  |y-\hat{y}|\leq\delta \\ \delta(|y-\hat{y}|-\dfrac{1}{2}}\delta),&amp; O.W. \end{array} \right. \end{equation}$$`  
+
+`$$Loss(y,\hat{y}) = \begin{equation} \left\{ \begin{array}{**lr**} \frac{1}{2}(y-\hat{y})^2,&amp;  |y-\hat{y}|\leq\delta \\ \delta(|y-\hat{y}|-\frac{1}{2}\delta),&amp; O.W. \end{array} \right. \end{equation}$$`  
 
 `\(\alpha\)`-balance Focal Loss  
 給CE加上權重  
+
 `$$FL (p_t)= -\alpha(1-p_t)^\gamma \log(p_t)$$`  
 where `\(\gamma\)` is focusing parameter.  
 ---
 # Fitting Neural Network  
 .left-column[
 ## Loss Function  
-## Back Propagation  
+## Back Propagation&lt;sup&gt;6&lt;/sup&gt;  
 ]  
 
 .right-column[
 &gt; 與一般模型一樣，我們需要極小化損失函數來提升模型的準確率。但模型不像傳統迴歸問題那樣，而是可能包含許多隱藏層，因此需要逐層調整。剛好，透過大家都會的連鎖率(*chain rule*)可以輕鬆做到。  
 
+]  
+.footnote[
+&lt;font size="2"&gt;[6] David E. Rumelhart, Geoffrey E. Hinton, and Ronald J. Williams. (1985). Learning Internal Representation by Error Propagation.&lt;/font&gt;
 ]
 ---
 # Fitting Neural Network  
@@ -265,10 +274,10 @@ where `\(\gamma\)` is focusing parameter.
 .right-column[
 `$$\small{R(\theta)=\sum_{i=1}^N \sum_{k=1}^K(y_{ik}-g_k(\beta_0+\beta_k^T(\sigma(\alpha_{0m}+\alpha_m^Tx_i))))\tag{2.3}}$$`
 分別對 `\(\alpha,\ \beta\)`微分，  
-`$$\small{\begin{align*} \dfrac{\partial R_i}{\partial \beta_{km}} = -2&amp;\color{blue}{(y_{ik}-f_k(x_i))g_k'(\beta_k^Tz_i)}z_{mi} \\ \dfrac{\partial R_i}{\partial \alpha_{ml}} =-2\sum_{k=1}^K&amp;\color{blue}{(y_{ik}-f_k(x_i))g_k'(\beta_k^Tz_i)}\beta_{km}\sigma'(\alpha_m^Tx_i)x_{il}\end{align*}\tag{2.4}}$$`  
+`$$\small{\begin{align*} \dfrac{\partial R_i}{\partial \beta_{km}} = -2&amp;\color{blue}{(y_{ik}-f_k(x_i))g_k'(\beta_{0k}+\beta_k^Tz_i)}z_{mi} \\ \dfrac{\partial R_i}{\partial \alpha_{m\ell}} =-2\sum_{k=1}^K&amp;\color{blue}{(y_{ik}-f_k(x_i))g_k'(\beta_{0k}+\beta_k^Tz_i)}\beta_{km}\sigma'(\alpha_{0m}+\alpha_m^Tx_i)x_{i\ell}\end{align*}\tag{2.4}}$$`  
 因此在第( `\(r+1\)`)步時，迭代更新為  
 
-`$$\small{\begin{align*}\beta_{km}^{(r+1)}&amp;=\beta_{km}^{(r)}-\gamma_r\sum_{i=1}^N \dfrac{\partial R_i}{\partial \beta_{km}^{(r)}} \\ \alpha_{ml}^{(r+1)}&amp;=\alpha_{ml}^{(r)}-\gamma_r\sum_{i=1}^N \dfrac{\partial R_i}{\partial \alpha_{ml}^{(r)}}\end{align*} \tag{2.5}}$$`
+`$$\small{\begin{align*}\beta_{km}^{(r+1)}&amp;=\beta_{km}^{(r)}-\gamma_r\sum_{i=1}^N \dfrac{\partial R_i}{\partial \beta_{km}^{(r)}} \\ \alpha_{m\ell}^{(r+1)}&amp;=\alpha_{m\ell}^{(r)}-\gamma_r\sum_{i=1}^N \dfrac{\partial R_i}{\partial \alpha_{m\ell}^{(r)}}\end{align*} \tag{2.5}}$$`
 ]
 ---
 # Fitting Neural Network  
@@ -279,9 +288,9 @@ where `\(\gamma\)` is focusing parameter.
 
 .right-column[
 改寫 (2.4)，  
-`$$\begin{align*} \dfrac{\partial R_i}{\partial \beta_{km}} = \delta_{ki}z_{mi} \\ \dfrac{\partial R_i}{\partial \alpha_{ml}} =s_{mi}x_{il}\end{align*}\tag{2.6}$$`
+`$$\begin{align*} \dfrac{\partial R_i}{\partial \beta_{km}} = \delta_{ki}z_{mi} \\ \dfrac{\partial R_i}{\partial \alpha_{m\ell}} =s_{mi}x_{i\ell}\end{align*}\tag{2.6}$$`
 由 (2.4)，我們可以得到  
-`$$\small{s_{mi}=\sigma'(\alpha^T_mx_i)\sum_{k=1}^K\beta_{km}\delta_{ki}\tag{2.7}}$$`  
+`$$\small{s_{mi}=\sigma'(\alpha_{0m}+\alpha^T_mx_i)\sum_{k=1}^K\beta_{km}\delta_{ki}\tag{2.7}}$$`  
 &gt; 通過上式，我們能完成一套 *two-pass*過程。首先 *forward pass*的部分，給定權重計算出 `\(\hat{f_k}(x_i)\)`； *backward pass*則是透過(2.4)、(2.5)去進行權重的更新，這套流程也就是&lt;font color = "blue"&gt;&lt;b&gt;向後傳播&lt;/b&gt;&lt;/font&gt;。
 
 ]
@@ -388,12 +397,12 @@ playground NN +-0.5
 `$$\large{Loss Function = R(\theta)+\lambda\color{blue}{J(\theta)}} \\ \small{\lambda 在這裡為一個調整參數，值越大，權重縮減幅度越大。}$$`  
   - &lt;font color = "blue"&gt;*weight decay*&lt;/font&gt;: `\(J(\theta)=\sum {w_i}^2\)`  
   
-  - &lt;font color = "blue"&gt;*weight elimination*&lt;/font&gt;&lt;sup&gt;6&lt;/sup&gt;: `\(J(\theta)=\sum w_i^2/(1+w_i^2)\)`  
+  - &lt;font color = "blue"&gt;*weight elimination*&lt;/font&gt;&lt;sup&gt;7&lt;/sup&gt;: `\(J(\theta)=\sum w_i^2/(1+w_i^2)\)`  
 - &lt;font color = "blue"&gt;&lt;b&gt;&lt;i&gt;Drop-out&lt;/i&gt;&lt;/b&gt;&lt;/font&gt; ...
 ]
 
 .footnote[
-&lt;font size="2"&gt;[6] 為了解決&lt;i&gt;weight decay&lt;/i&gt;遺留下來很多數字小但非0的權重，又要兼具L2容易微分的優點。&lt;/font&gt;
+&lt;font size="2"&gt;[7] 為了解決&lt;i&gt;weight decay&lt;/i&gt;遺留下來很多數字小但非0的權重，又要兼具L2容易微分的優點。&lt;/font&gt;
 ]
 ---
 # Issues  
@@ -423,13 +432,13 @@ playground NN +-0.5
   
 - 依靠背景知識、過往經驗等等來決定要設定幾層隱藏層。  
 
-- 增加神經元(*neuron*)可以提升模型的解釋能力及複雜度&lt;sup&gt;7&lt;/sup&gt;。  
+- 增加神經元(*neuron*)可以提升模型的解釋能力及複雜度&lt;sup&gt;8&lt;/sup&gt;。  
 
 - 增加隱藏層可能可以提升模型準確率(*accuracy*)，但過多可能會造成預測力下降。  
 ]  
 
 .footnote[
-&lt;font size="2"&gt;[7] Ian Goodfellow, Yoshua Bengio and Aaron Courville. (2016). Deep Learning. MIT Press.&lt;/font&gt;
+&lt;font size="2"&gt;[8] Ian Goodfellow, Yoshua Bengio and Aaron Courville. (2016). Deep Learning. MIT Press.&lt;/font&gt;
 ]
 
 ???
@@ -452,11 +461,11 @@ playground NN +-0.5
 - 提升學習率(*learning rate*)  
   
 - 嘗試其他[演算法](http://ruder.io/optimizing-gradient-descent/)  
-- 不管他&lt;sup&gt;8&lt;/sup&gt;。當模型漸趨複雜，過於追求&lt;font color = "blue"&gt;真正的&lt;/font&gt;最小值(*global minimun*)，往往會造成過度配適的問題發生。
+- 不管他&lt;sup&gt;9&lt;/sup&gt;。當模型漸趨複雜，過於追求&lt;font color = "blue"&gt;真正的&lt;/font&gt;最小值(*global minimun*)，往往會造成過度配適的問題發生。
 ]
 
 .footnote[
-&lt;font size="2"&gt;[8] Anna Choromanska, Mikael Henaff, Michael Mathieu, G´erard Ben Arous and Yann LeCun. (2015). The Loss Surfaces of Multilayer Networks. Journal of Machine Learning Research.&lt;/font&gt;
+&lt;font size="2"&gt;[9] Anna Choromanska, Mikael Henaff, Michael Mathieu, G´erard Ben Arous and Yann LeCun. (2015). The Loss Surfaces of Multilayer Networks. Journal of Machine Learning Research.&lt;/font&gt;
 ]
 ---
 # Example  
@@ -466,6 +475,9 @@ playground NN +-0.5
 
 ---
 
+CNN 模仿視覺，分析局部特徵  透過matching、pooling等過程  
+RNN 考慮前後關係，常應用在NLP  
+---
 
 ???
 
