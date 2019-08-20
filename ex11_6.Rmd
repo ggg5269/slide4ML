@@ -10,6 +10,7 @@ output:
 
 ```{r include=FALSE}
 library(hash)
+library(tidyverse)
 ```
 
 ## DATA GEN.  
@@ -69,7 +70,7 @@ train <-
   function(nneuron = 2,
            epoch = 500,
            learning_rate = 0.0001,
-           lambda = 0.01) {
+           lambda = 0.1) {
     
     # weights and biases
     alpha <-
@@ -87,16 +88,13 @@ train <-
       pred <- t
       
       delta <- -2 * (Y_train - pred)
-      d_beta <- t(z) %*% delta
+      d_beta <- t(z) %*% delta + 2 * lambda * beta
       d_b <- matrix(apply(delta, 2, sum), 1, 1, T)
       
       s <- delta %*% t(beta) * (z * (1 - z))
-      d_alpha <- t(X_train) %*% s
+      d_alpha <- t(X_train) %*% s + 2 * lambda * alpha
       d_a <- matrix(apply(s, 2, sum), 1, nneuron, T)
-      
-      d_beta <- d_beta + 2 * lambda * beta
-      d_alpha <- d_alpha + 2 * lambda * alpha
-      
+
       alpha <-  alpha - learning_rate * d_alpha
       a <- a - learning_rate * d_a
       beta <- beta - learning_rate * d_beta
@@ -119,15 +117,31 @@ test <- function(model) {
   z <- sigmoid(sweep(X_test %*% model$alpha, 2, model$a, "+"))
   t <- sweep(z %*% model$beta, 2, model$b, "+")
   pred <- t
-  pred.loss <- 1 / 10000 * sum((pred - Y_test) ^ 2)
+  pred.loss <-sum((pred - Y_test) ^ 2) / 10000
   return(pred.loss)
 }
 ```
 
 ```{r}
-test(train(2, 50000))
+test(train(1, 5000000, lambda = 0))
 ```
 
+```{r}
+loss <- as.data.frame(matrix(0, 100, 8)) 
+
+for (i in 1:8) {
+  for (j in 1:50) {
+    model <- train(nneuron = i - 1, epoch = 500000, lambda = 0.1)
+    loss[j, i] <- test(model)
+  }
+}
+```
+
+```{r}
+colnames(loss) <- c('0','1', '2','3','4','5','6','7')
+boxplot(loss)
+#ggplot(data = loss, aes(x = ,y))
+```
 
 
 

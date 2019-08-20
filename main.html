@@ -17,7 +17,7 @@ background-image: linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, rgba(255,
 # &lt;big&gt;&lt;font color = "white"&gt;NEURAL NETWORK&lt;/font&gt;&lt;/big&gt;
 ## &lt;big&gt;&lt;font color = "white"&gt;ESL&lt;/font&gt;&lt;/big&gt;
 &lt;hr /&gt;
-七月 29 2019 &lt;br/&gt;
+八月 18 2019 &lt;br/&gt;
 陳懷安
 ]
 ---
@@ -48,14 +48,15 @@ background-size: cover
 .right-column[.small[
 `$$\large{f(X)=\sum_{m=1}^M \color{blue}{g_m(w_m^TX)} \tag{1.1}}$$`   `$$where \ g:\mathbb{R} \rightarrow\mathbb{R}, and \  w\in\mathbb{R}^p \backslash \lbrace0\rbrace$$`]  
 --
-其中 `\(\color{blue}{g_m(w_m^TX)}\)`為嶺函數(*ridge function*&lt;sup&gt;2&lt;/sup&gt;)，目的是將 `\(X\)`投影在 `\(w\)`方向向量上，透過 `\(g\)`作用後的加總來逼近迴歸函數。  
+其中 `\(\color{blue}{g_m(w_m^TX)}\)`為嶺函數([*ridge function*](https://www.encyclopediaofmath.org/index.php/Ridge_function)&lt;sup&gt;2&lt;/sup&gt;)，目的是將 `\(X\)`投影在 `\(w\)`方向向量上，透過 `\(g\)`作用後的加總來逼近迴歸函數。  
 
 ]
 
 .small[.footnote[
 &lt;font size="2"&gt;
 [1] Friedman, J.H. and Stuetzle, W. (1981) Projection Pursuit Regression. Journal of the American Statistical Association.&lt;br/&gt;
-[2] B. F. Logan and L. A. Shepp (1975). Optimal Reconstruction of a Function From Its Projections. Duke Mathematical Journal.  
+[2] B. F. Logan and L. A. Shepp (1975). Optimal Reconstruction of a Function From Its Projections. Duke Mathematical Journal.&lt;br/&gt;  
+&amp;nbsp &amp;nbsp &amp;nbsp &lt;b&gt;Ridge function is a multivariate function constant on the parallel hyperplanes `\(wX=c,\ c\in\mathbb{R}.\)`&lt;/b&gt;
 &lt;/font&gt;
 ]]
 ---
@@ -138,7 +139,7 @@ background-size: cover
 --
 
 
-- 激勵函數(*activation funtion*&lt;sup&gt;4&lt;/sup&gt;) `\(\color{blue}{\sigma(v)}\)`，如： `\(\sigma(v)=1/(1+e^{-v})\)`。  
+- 激勵函數(*activation function*&lt;sup&gt;4&lt;/sup&gt;) `\(\color{blue}{\sigma(v)}\)`，如： `\(\sigma(v)=1/(1+e^{-v})\)`。  
 - `\(g_k(X)\)`作為最後的轉換函數。  
   - 在迴歸中，一般就採用 `\(g_k(T) = T\)`  
   
@@ -195,12 +196,17 @@ Leaky ReLU 避免dead ReLU problem
 ## Equivalent To PPR  
 For single-layer network, say `\(g_k(T) = T_k\)`is identity function.  
 
-`$$\large{\begin{align*}f_k(X)=g_k(T)=T_k&amp;=\beta_{0k}+\sum_{m=1}^M\beta_{km}^TZ_m\\ &amp;=\beta_{0k}+\sum_{m=1}^M\beta_{km}^T\sigma(\alpha_{0m}+\alpha_m^TX)\\ &amp;=\sum_{m=0}^M\beta_{km}^T\sigma(\alpha_{0m}+||\alpha_{0m}||(w_m^TX))\tag{2.2}\end{align*}}$$`  
+`$$\large{\begin{align*}f_k(X)=g_k(T)=T_k&amp;=\beta_{0k}+\sum_{m=1}^M\beta_{km}^TZ_m\\ &amp;=\beta_{0k}+\sum_{m=1}^M\beta_{km}^T\sigma(\alpha_{0m}+\alpha_m^TX)\\ &amp;=\sum_{m=0}^M\beta_{km}^T\sigma(\alpha_{0m}+||\alpha_{m}||(w_m^TX))\tag{2.2}\end{align*}}$$`  
 --
 So it is equivalent to PPR with `\(\color{blue}{g_m(w_m^TX)=\beta_{km}^T\sigma(\alpha_{0m}+||\alpha_{0m}||(w_m^TX))}\)` for the `\(\color{blue}{m_{th}}\)`output.  
 &lt;br/&gt;
-我們可以將其看做一個三個參數的模型 `\(\sigma_{\color{blue}{\beta,\alpha_0,s}}(v)=\beta\sigma(\alpha_0+sv)\)`，比起PPR的 `\(g(v)\)`單純很多。  
-
+我們可以將其看做一個三個參數的模型&lt;sup&gt;5&lt;/sup&gt; `\(\sigma_{\color{blue}{\beta,\alpha_0,s}}(v)=\beta\sigma(\alpha_0+sv)\)`，比起PPR的 `\(g(v)\)`單純很多。  
+  
+  
+.footnote[
+&lt;font size="2"&gt;[5] A. Pinkus, "Approximation theory of the MLP model in neural networks" Acta Numerica.&lt;/font&gt;
+]
+  
 ???
 因此不難想像為何NN動輒幾十層。  
 
@@ -222,7 +228,7 @@ So it is equivalent to PPR with `\(\color{blue}{g_m(w_m^TX)=\beta_{km}^T\sigma(\
 - MAE  
   - `\(\large{R(\theta)=\frac{\sum|y_i-\hat{y_i}|}{n}}\)`  
   
-- Huber Loss ...  
+- Huber Loss   
 
 ]
 
@@ -231,14 +237,14 @@ So it is equivalent to PPR with `\(\color{blue}{g_m(w_m^TX)=\beta_{km}^T\sigma(\
 - Cross Entropy  
   - `\(R(\theta)=\sum\sum -y_{c,i}\log(p_{c,i})\)`  
   
-- Focal Loss&lt;sup&gt;5&lt;/sup&gt; ...  
+- Focal Loss&lt;sup&gt;6&lt;/sup&gt;   
 
 ]
 ]
   
 
 .footnote[
-&lt;font size="2"&gt;[5] Tsung-Yi Lin, Priya Goyal, Ross Girshick, Kaiming He, Piotr Dollar. (2017). Focal Loss for Dense Object Detection. Facebook AI Research.&lt;/font&gt;
+&lt;font size="2"&gt;[6] Tsung-Yi Lin, Priya Goyal, Ross Girshick, Kaiming He, Piotr Dollar. (2017). Focal Loss for Dense Object Detection. Facebook AI Research.&lt;/font&gt;
 ]
 ???
 Huber  
@@ -255,7 +261,7 @@ where `\(\gamma\)` is focusing parameter.
 # Fitting Neural Network  
 .left-column[
 ## Loss Function  
-## Back Propagation&lt;sup&gt;6&lt;/sup&gt;  
+## Back Propagation&lt;sup&gt;7&lt;/sup&gt;  
 ]  
 
 .right-column[
@@ -263,7 +269,7 @@ where `\(\gamma\)` is focusing parameter.
 
 ]  
 .footnote[
-&lt;font size="2"&gt;[6] David E. Rumelhart, Geoffrey E. Hinton, and Ronald J. Williams. (1985). Learning Internal Representation by Error Propagation.&lt;/font&gt;
+&lt;font size="2"&gt;[7] David E. Rumelhart, Geoffrey E. Hinton, and Ronald J. Williams. (1985). Learning Internal Representation by Error Propagation.&lt;/font&gt;
 ]
 ---
 # Fitting Neural Network  
@@ -272,7 +278,7 @@ where `\(\gamma\)` is focusing parameter.
 ## Back Propagation  
 ]  
 .right-column[
-`$$\small{R(\theta)=\sum_{i=1}^N \sum_{k=1}^K(y_{ik}-g_k(\beta_0+\beta_k^T(\sigma(\alpha_{0m}+\alpha_m^Tx_i))))\tag{2.3}}$$`
+`$$\small{R(\theta)=\sum_{i=1}^N \sum_{k=1}^K(y_{ik}-g_k(\beta_0+\beta_k^T(\sigma(\alpha_{0m}+\alpha_m^Tx_i))))^2\tag{2.3}}$$`
 分別對 `\(\alpha,\ \beta\)`微分，  
 `$$\small{\begin{align*} \dfrac{\partial R_i}{\partial \beta_{km}} = -2&amp;\color{blue}{(y_{ik}-f_k(x_i))g_k'(\beta_{0k}+\beta_k^Tz_i)}z_{mi} \\ \dfrac{\partial R_i}{\partial \alpha_{m\ell}} =-2\sum_{k=1}^K&amp;\color{blue}{(y_{ik}-f_k(x_i))g_k'(\beta_{0k}+\beta_k^Tz_i)}\beta_{km}\sigma'(\alpha_{0m}+\alpha_m^Tx_i)x_{i\ell}\end{align*}\tag{2.4}}$$`  
 因此在第( `\(r+1\)`)步時，迭代更新為  
@@ -376,8 +382,10 @@ fig 7. batch size 10
   
 fig 8. sigmoid function
 ]
-&gt; 上圖為 `\(\sigma(sx)=1/(1+\exp(-sx))\)`, `\(s\)` 分別為 `\(1, 0.3, 10\)`。  
+- 上圖為 `\(\sigma(sx)=1/(1+\exp(-sx))\)`, `\(s\)` 分別為 `\(1, 0.3, 10\)`。  
 一般都會以一個接近零的數字開始，讓模型逐步從近似線性到非線性。  
+- 可以設定  
+`$$\large{w_i \sim \rm{U(-0.7, 0.7)}}$$`
 
 ]
 
@@ -397,12 +405,12 @@ playground NN +-0.5
 `$$\large{Loss Function = R(\theta)+\lambda\color{blue}{J(\theta)}} \\ \small{\lambda 在這裡為一個調整參數，值越大，權重縮減幅度越大。}$$`  
   - &lt;font color = "blue"&gt;*weight decay*&lt;/font&gt;: `\(J(\theta)=\sum {w_i}^2\)`  
   
-  - &lt;font color = "blue"&gt;*weight elimination*&lt;/font&gt;&lt;sup&gt;7&lt;/sup&gt;: `\(J(\theta)=\sum w_i^2/(1+w_i^2)\)`  
+  - &lt;font color = "blue"&gt;*weight elimination*&lt;/font&gt;&lt;sup&gt;8&lt;/sup&gt;: `\(J(\theta)=\sum (w_i/w_0)^2/(1+(w_i/w_0)^2)\)`  
 - &lt;font color = "blue"&gt;&lt;b&gt;&lt;i&gt;Drop-out&lt;/i&gt;&lt;/b&gt;&lt;/font&gt; ...
 ]
 
 .footnote[
-&lt;font size="2"&gt;[7] 為了解決&lt;i&gt;weight decay&lt;/i&gt;遺留下來很多數字小但非0的權重，又要兼具L2容易微分的優點。&lt;/font&gt;
+&lt;font size="2"&gt;[8] Andreas S. Weigend, David E. Rumelhart, Bernardo A. Huberman. (1991). Generalization by Weight-Elimination with Application to Forecasting. Advances in Neural Information Processing Systems. &lt;br/&gt;為了解決&lt;i&gt;weight decay&lt;/i&gt;遺留下來很多數字小但非0的權重，又要兼具L2容易微分的優點。&lt;/font&gt;
 ]
 ---
 # Issues  
@@ -414,9 +422,7 @@ playground NN +-0.5
 
 .right-column[
 - 在自變數的處理上可以先標準化，避免在正規化的過程，受到數值規模不同的干擾。  
-
-- 接著，一般起始的權重，會設定  
-`$$\large{w_i \sim \rm{U(-0.7, 0.7)}}$$`
+  
 ]
 ---
 # Issues  
@@ -432,13 +438,13 @@ playground NN +-0.5
   
 - 依靠背景知識、過往經驗等等來決定要設定幾層隱藏層。  
 
-- 增加神經元(*neuron*)可以提升模型的解釋能力及複雜度&lt;sup&gt;8&lt;/sup&gt;。  
+- 增加神經元(*neuron*)可以提升模型的解釋能力及複雜度&lt;sup&gt;9&lt;/sup&gt;。  
 
 - 增加隱藏層可能可以提升模型準確率(*accuracy*)，但過多可能會造成預測力下降。  
 ]  
 
 .footnote[
-&lt;font size="2"&gt;[8] Ian Goodfellow, Yoshua Bengio and Aaron Courville. (2016). Deep Learning. MIT Press.&lt;/font&gt;
+&lt;font size="2"&gt;[9] Ian Goodfellow, Yoshua Bengio and Aaron Courville. (2016). Deep Learning. MIT Press.&lt;/font&gt;
 ]
 
 ???
@@ -461,28 +467,25 @@ playground NN +-0.5
 - 提升學習率(*learning rate*)  
   
 - 嘗試其他[演算法](http://ruder.io/optimizing-gradient-descent/)  
-- 不管他&lt;sup&gt;9&lt;/sup&gt;。當模型漸趨複雜，過於追求&lt;font color = "blue"&gt;真正的&lt;/font&gt;最小值(*global minimun*)，往往會造成過度配適的問題發生。
+- 不管他&lt;sup&gt;10&lt;/sup&gt;。當模型漸趨複雜，過於追求&lt;font color = "blue"&gt;真正的&lt;/font&gt;最小值(*global minimun*)，往往會造成過度配適的問題發生。
 ]
 
 .footnote[
-&lt;font size="2"&gt;[9] Anna Choromanska, Mikael Henaff, Michael Mathieu, G´erard Ben Arous and Yann LeCun. (2015). The Loss Surfaces of Multilayer Networks. Journal of Machine Learning Research.&lt;/font&gt;
+&lt;font size="2"&gt;[10] Anna Choromanska, Mikael Henaff, Michael Mathieu, G´erard Ben Arous and Yann LeCun. (2015). The Loss Surfaces of Multilayer Networks. Journal of Machine Learning Research.&lt;/font&gt;
 ]
 ---
 # Example  
 
-[Here's the example](https://ggg5269.github.io/slide4ML/ex11_6.html)
+Here's the [example](https://ggg5269.github.io/slide4ML/ex11_6.html) for 11.6.   
+
 ---
 # Discussion  
 
+&gt;適用於高訊號雜訊比(signal-to-noise ratio)且不需要針對預測結果去做解釋的情況。
 ---
 
 CNN 模仿視覺，分析局部特徵  透過matching、pooling等過程  
-RNN 考慮前後關係，常應用在NLP  
----
-
-???
-
-記得補tag
+RNN 考慮前後關係，常應用在NLP
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
