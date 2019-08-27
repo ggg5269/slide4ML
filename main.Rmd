@@ -91,7 +91,7 @@ $$w^T = \frac{1}{\sqrt2}\left[\matrix{1 \\ 1}\right], \ V=w^TX, \ V=\frac{X_1+X_
 ]
 
 .right-column[
-$$min\ \sum_{i=1}^N \left[y_i-\sum_{m=1}^M g_m(w_m^TX)\right]\tag{1.2}$$  
+$$min\ \sum_{i=1}^N \left[y_i-\sum_{m=1}^M g_m(w_m^TX)\right]^2\tag{1.2}$$  
 - $\color{blue}{估計\ g}$  
 給定 $w$，透過平滑算法，如:*smoothing spline*，得到 $\hat{g}$。
 - $\color{blue}{估計\ w}$  
@@ -153,7 +153,7 @@ $$\large{\large{\begin{align}Z_m&=\color{blue}{\sigma}(\alpha_{0m}+\alpha_m^TX),
   - 分類模型，使用*softmax function*<sup>3</sup>會比較好  
 
 .footnote[
-<font size="2">[3] $g_k(T)=e^{Tk}/\sum^K_{l=1}e^Tk$</font><br/>
+<font size="2">[3] $g_k(T)=e^{T_k}/\sum^K_{k=1}e^{T_k}$</font><br/>
 <font size="2">[4] 較早期的模型在 $\sigma(Z),\ g_m(T)$多採用階梯函數(<i>step function</i>)。之後類神經網路用來做非線性統計建模時，階梯函數在優化上就不如一些閾值較平滑的函數。</font>
 ]
 

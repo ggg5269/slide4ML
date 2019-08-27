@@ -17,7 +17,7 @@ background-image: linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, rgba(255,
 # &lt;big&gt;&lt;font color = "white"&gt;NEURAL NETWORK&lt;/font&gt;&lt;/big&gt;
 ## &lt;big&gt;&lt;font color = "white"&gt;ESL&lt;/font&gt;&lt;/big&gt;
 &lt;hr /&gt;
-八月 18 2019 &lt;br/&gt;
+八月 27 2019 &lt;br/&gt;
 陳懷安
 ]
 ---
@@ -84,7 +84,7 @@ background-size: cover
 ]
 
 .right-column[
-`$$min\ \sum_{i=1}^N \left[y_i-\sum_{m=1}^M g_m(w_m^TX)\right]\tag{1.2}$$`  
+`$$min\ \sum_{i=1}^N \left[y_i-\sum_{m=1}^M g_m(w_m^TX)\right]^2\tag{1.2}$$`  
 - `\(\color{blue}{估計\ g}\)`  
 給定 `\(w\)`，透過平滑算法，如:*smoothing spline*，得到 `\(\hat{g}\)`。
 - `\(\color{blue}{估計\ w}\)`  
@@ -146,7 +146,7 @@ background-size: cover
   - 分類模型，使用*softmax function*&lt;sup&gt;3&lt;/sup&gt;會比較好  
 
 .footnote[
-&lt;font size="2"&gt;[3] `\(g_k(T)=e^{Tk}/\sum^K_{l=1}e^Tk\)`&lt;/font&gt;&lt;br/&gt;
+&lt;font size="2"&gt;[3] `\(g_k(T)=e^{T_k}/\sum^K_{k=1}e^{T_k}\)`&lt;/font&gt;&lt;br/&gt;
 &lt;font size="2"&gt;[4] 較早期的模型在 `\(\sigma(Z),\ g_m(T)\)`多採用階梯函數(&lt;i&gt;step function&lt;/i&gt;)。之後類神經網路用來做非線性統計建模時，階梯函數在優化上就不如一些閾值較平滑的函數。&lt;/font&gt;
 ]
 
